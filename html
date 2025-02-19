@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>GÜLER MUTFAK LEZZETLERİ</title>
+  <style>
+    /* Genel sıfırlama */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(120deg, #f9d423, #ff4e50);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    /* Üst Kısım & Hamburger Menüsü */
+    header {
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      position: relative;
+    }
+    header h1 {
+      color: #fff;
+      font-size: 1.8em;
+      font-weight: bold;
+    }
+    .hamburger {
+      position: absolute;
+      left: 15px;
+      font-size: 1.8em;
+      color: #fff;
+      cursor: pointer;
+    }
+    /* Yan Menü (Sidenav) */
+    .sidenav {
+      height: 100%;
+      width: 0;
+      position: fixed;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      background-color: rgba(0,0,0,0.9);
+      overflow-x: hidden;
+      transition: 0.3s;
+      padding-top: 60px;
+    }
+    .sidenav .closebtn {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-size: 2em;
+      cursor: pointer;
+      color: #fff;
+    }
+    .sidenav a {
+      padding: 8px 32px;
+      text-decoration: none;
+      font-size: 1.2em;
+      color: #fff;
+      display: block;
+      transition: 0.3s;
+    }
+    .sidenav a:hover { color: #f1f1f1; }
+    /* Favoriler Liste Bölümü */
+    #favoritesContainer {
+      padding: 10px 32px;
+      color: #fff;
+      font-size: 0.95em;
+    }
+    /* Ana Kapsayıcı */
+    .container {
+      flex: 1;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 10px;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      position: relative;
+    }
+    /* Söz Arama Kutusu */
+    .quote-search {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    .quote-search input {
+      padding: 10px;
+      width: 70%;
+      max-width: 400px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
+    .quote-search button {
+      padding: 10px 15px;
+      background: #f9d423;
+      color: #333;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 5px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .quote-search button:hover { background: #f6c413; }
+    /* Söz Kutusu */
+    #quoteBox {
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      font-size: 1.2em;
+      text-align: center;
+      min-height: 60px;
+      position: relative;
+      opacity: 0;
+      animation: fadeIn 0.8s forwards;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(15px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    /* Kalp ikonu */
+    #favoriteIcon {
+      font-size: 1.6em;
+      cursor: pointer;
+      user-select: none;
+    }
+    /* Buton Grubu */
+    .button-group {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .button-group button {
+      padding: 12px 20px;
+      margin: 5px;
+      background: #ff4e50;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .button-group button:hover { background: #f53844; }
+    /* Emoji Bölümü */
+    .emoji-section {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .emoji-section h3 { margin-bottom: 15px; color: #fff; }
+    .emoji-container {
+      display: flex;
+      overflow-x: auto;
+      white-space: nowrap;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+    .emoji-item {
+      font-size: 1.8em;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.2s;
+      flex: 0 0 auto;
+    }
+    .emoji-item:hover { transform: scale(1.2); }
+    /* Etiket Arama (En Altta) */
+    .hashtag-search {
+      margin-top: 40px;
+      text-align: center;
+    }
+    .hashtag-search h3 { margin-bottom: 15px; color: #fff; }
+    .hashtag-search input {
+      padding: 10px;
+      width: 200px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+      margin-right: 10px;
+      outline: none;
+    }
+    .hashtag-search button {
+      padding: 10px 15px;
+      background: #f9d423;
+      color: #333;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    .hashtag-search button:hover { background: #f6c413; }
+    .hashtag-results {
+      margin-top: 15px;
+      text-align: center;
+      font-size: 1.1em;
+    }
+    .hashtag-results span {
+      display: inline-block;
+      margin: 5px;
+      padding: 5px 10px;
+      background: #fff;
+      border-radius: 3px;
+    }
+    /* Mobil uyum */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.4em; }
+      .container { margin: 20px auto; width: 90%; padding: 15px; }
+      #quoteBox { font-size: 1.1em; }
+      .quote-search input { width: 60%; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Üst Kısım: Başlık ve Hamburger Menü -->
+  <header>
+    <span class="hamburger" onclick="openNav()">&#9776;</span>
+    <h1>GÜLER MUTFAK LEZZETLERİ</h1>
+  </header>
+
+  <!-- Yan Menü (Sidenav) -->
+  <div id="sideNav" class="sidenav">
+    <span class="closebtn" onclick="closeNav()">&times;</span>
+    <a href="javascript:void(0)" onclick="toggleFavoritesView()">Favoriler</a>
+    <div id="favoritesContainer"></div>
+  </div>
+
+  <!-- Ana İçerik Kapsayıcısı -->
+  <div class="container">
+    <!-- Söz Arama Kutusu -->
+    <div class="quote-search">
+      <input type="text" id="quoteSearchInput" placeholder="Söz ara..." />
+      <button onclick="searchQuote()">Ara</button>
+    </div>
+
+    <!-- Söz Kutusu (Favori kalp ikonu eklenecek) -->
+    <div id="quoteBox">
+      <!-- Söz metni ayrı bir span içine eklenecek -->
+    </div>
+    
+    <!-- Buton Grubu: Yeni Söz Getir, Sözü Kopyala -->
+    <div class="button-group">
+      <button onclick="updateQuote()">Yeni Söz Getir</button>
+      <button onclick="copyQuote()">Sözü Kopyala</button>
+    </div>
+    
+    <!-- Emoji Bölümü -->
+    <div class="emoji-section">
+      <h3>Yemek & Mutfak Emojileri</h3>
+      <div class="emoji-container" id="emojiContainer">
+        <div class="emoji-item" onclick="copyEmoji('🍔')">🍔</div>
+        <div class="emoji-item" onclick="copyEmoji('🍟')">🍟</div>
+        <div class="emoji-item" onclick="copyEmoji('🍕')">🍕</div>
+        <div class="emoji-item" onclick="copyEmoji('🍝')">🍝</div>
+        <div class="emoji-item" onclick="copyEmoji('🍣')">🍣</div>
+        <div class="emoji-item" onclick="copyEmoji('🍰')">🍰</div>
+        <div class="emoji-item" onclick="copyEmoji('🍩')">🍩</div>
+        <div class="emoji-item" onclick="copyEmoji('🍪')">🍪</div>
+        <div class="emoji-item" onclick="copyEmoji('🍜')">🍜</div>
+        <div class="emoji-item" onclick="copyEmoji('🥘')">🥘</div>
+        <div class="emoji-item" onclick="copyEmoji('🍦')">🍦</div>
+        <div class="emoji-item" onclick="copyEmoji('🍛')">🍛</div>
+        <div class="emoji-item" onclick="copyEmoji('🥗')">🥗</div>
+        <div class="emoji-item" onclick="copyEmoji('🍲')">🍲</div>
+        <div class="emoji-item" onclick="copyEmoji('🍿')">🍿</div>
+        <div class="emoji-item" onclick="copyEmoji('🥯')">🥯</div>
+        <div class="emoji-item" onclick="copyEmoji('🥞')">🥞</div>
+        <div class="emoji-item" onclick="copyEmoji('🍤')">🍤</div>
+        <div class="emoji-item" onclick="copyEmoji('🍙')">🍙</div>
+        <div class="emoji-item" onclick="copyEmoji('🍚')">🍚</div>
+        <div class="emoji-item" onclick="copyEmoji('🍘')">🍘</div>
+      </div>
+    </div>
+
+    <!-- Etiket Arama Bölümü (En Altta) -->
+    <div class="hashtag-search">
+      <h3>Etiket Arama</h3>
+      <input type="text" id="hashtagInput" placeholder="Kelime girin..." />
+      <button onclick="searchHashtags()">Ara</button>
+      <div id="hashtagResults" class="hashtag-results"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- Favori İşlemleri ---
+    let favorites = [];
+    if (localStorage.getItem('favorites')) {
+      favorites = JSON.parse(localStorage.getItem('favorites'));
+    }
+    // Belirtilen otomatik favori sözleri (varsa) kaldır
+    const bannedFavorites = [
+      "Çok pişmiş et varsa, kurumuş ekmek de bulunur elbet.",
+      "Her sabah tek derdim: Kahvaltı mı yapayım yoksa uykuma devam mı edeyim?",
+      "Menemen, soğanlı mı soğansız mı? Mutfakta tek tartışma bu olsun!"
+    ];
+    favorites = favorites.filter(fav => !bannedFavorites.includes(fav));
+    localStorage.setItem('favorites', JSON.stringify(favorites));
+
+    function updateFavoritesContainer() {
+      const container = document.getElementById("favoritesContainer");
+      // Güncel favorileri yeniden filtreleyelim (banned sözleri kaldır)
+      favorites = favorites.filter(fav => !bannedFavorites.includes(fav));
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      
+      container.innerHTML = "";
+      if (favorites.length === 0) {
+        container.innerHTML = "<p>Favori söz yok.</p>";
+      } else {
+        const title = document.createElement("strong");
+        title.textContent = "Favori Sözler:";
+        container.appendChild(title);
+        container.appendChild(document.createElement("br"));
+        container.appendChild(document.createElement("br"));
+        favorites.forEach((fav, i) => {
+          const favDiv = document.createElement("div");
+          favDiv.style.marginBottom = "10px";
+          const favSpan = document.createElement("span");
+          favSpan.textContent = (i + 1) + ". " + fav;
+          favDiv.appendChild(favSpan);
+          // "x" butonu ekle
+          const removeBtn = document.createElement("button");
+          removeBtn.textContent = " x";
+          removeBtn.style.marginLeft = "10px";
+          removeBtn.style.cursor = "pointer";
+          removeBtn.onclick = function() { removeFavorite(fav); };
+          favDiv.appendChild(removeBtn);
+          container.appendChild(favDiv);
+        });
+      }
+    }
+    function removeFavorite(quote) {
+      favorites = favorites.filter(fav => fav !== quote);
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      updateFavoritesContainer();
+      updateFavoriteIcon();
+    }
+    
+    // --- Hamburger Menü İşlemleri ---
+    function openNav() {
+      document.getElementById("sideNav").style.width = "250px";
+      updateFavoritesContainer();
+    }
+    function closeNav() {
+      document.getElementById("sideNav").style.width = "0";
+    }
+    function toggleFavoritesView() {
+      updateFavoritesContainer();
+    }
+    
+    // --- Yerel Sözler ---
+    const localQuotes = [
+      // Eski 15 söz
+      "Bir lokma mutluluk, koca bir gün gülümseme yaratır.",
+      "Sevgiyle pişen yemeğin tadı, tarif kitaplarında yazmaz.",
+      "Mutfağın sırrı, malzemelerin tazeliği değil, şefin kalbidir.",
+      "Tatlı yiyelim, tatlı konuşalım; hayat zaten kısa.",
+      "Ekmek paylaşınca çoğalır, muhabbet sofrada çoğalır.",
+      "Aşkın tarifi olmaz, ama sofrada başlar.",
+      "Bir yudum çorba, bin tebessüm.",
+      "En iyi sos, açlıktır.",
+      "Lezzetin sırrı, paylaştıkça çoğalır.",
+      "Kalbe giden yol mideden geçer.",
+      "Hayat baharatlarla güzelleşir.",
+      "Bir tutam sevgi, tüm tarifleri değiştirir.",
+      "En güzel tat, evde pişendir.",
+      "Mutfakta zaman geçirmek, ruhun dinlenmesidir.",
+      "Tabağınızdaki hikaye, şefin yüreğinden başlar.",
+      // Yeni eklenen sözler
+      "Mutfakta zaman geçirmek ruhuma iyi geliyor, mideme daha da iyi geliyor!",
+      "Benim diyet planım: Yemeği azalt, kahkahayı artır, tatlıyı asla ihmal etme!",
+      "Her tarife bir tutam sevgi eklemezsen, tadı hep eksik kalır!",
+      "Açken ben, ben değilim… Buzdolabına bakıp ‘Selam!’ demeye geldim.",
+      "Hayat kısa, tatlıları asla erteme!",
+      "Mutfakta geçen her dakika, gelecekteki mutluluğuma yatırım.",
+      "Haftada en az bir gün ‘Bugün kimseye yemek yapmıyorum!’ terapisine ihtiyacım var.",
+      "Tabağımda huzur, midemde mutluluk. Denklemi basit: Güzel yemek + iyi ruh hali!",
+      "Yemek yaparken dökülen malzemeler, tüm hatalarımı örten lezzet sisine dönüşür.",
+      "Mutfak benim laboratuvarım; bazen deneylerim lezzetli bir sonuca varıyor!",
+      "En büyük pişmanlığım: ‘Doydum’ demek zorunda kaldığım anlar.",
+      "Mutfakta kontrolü kaybettiğim an: Kaşığın tadı kontrol etmeye doyamadığı zaman!",
+      "Hayatın tadını çıkar; tuzunu biberini istediğin kadar ekle!",
+      "Spordan sonra kendimi mutfağa atıyorum, vücudum ‘Aferin bana’ diyor.",
+      "Benim diyetim: ‘Yarın başlarım!’ felsefesinden öteye geçemiyor.",
+      "Bugün mutfakta kahve yaparken kendimi şef gibi hissettim; sonra baktım tek yaptığım su kaynatmak.",
+      "Mutfak sırlarımdan biri: Dağınık görünen her şey aslında ‘sanat’ eseri.",
+      "Sevgiyle pişen yemeğin tuzu biberi yerini bulur, sevgi olmadan pişen yemekte eksik hep bir şey kalır.",
+      "Benden söylemesi: Mutfakta yaratıcılık bazen ortalığı batırmayı gerektirir!",
+      "Aşkın tarifi varsa, ilk malzemesi kesinlikle birlikte yemek yemektir.",
+      "Bugün menüde: Bir tutam huzur, iki damla tebessüm, yanında bol soslu eğlence!",
+      "Yemek bahaneleri tükenmez; ‘Üzüldüm, yiyeyim’, ‘Sevindim, yiyeyim’…",
+      "En hızlı diyet listesi: Sadece uyumak… Ama sabah kalkınca daha çok acıkıyorum.",
+      "Yanık tost, büyük bir aşkla pişmiş olabilir!",
+      "Yemek yaparken müzik açmak şart: Malzemelerin dansı, ruhumun doyumu!",
+      "Mutfağıma hoş geldiniz, dağınıklığım sanatsal kaosun bir yansımasıdır!",
+      "Bir insanı tanımak mı istiyorsun? Dolabına bak!",
+      "Tatlı yaparken parmak yalamak serbesttir, diyet yapanlar hariç!",
+      "Her başarısız tarif bir sonraki lezzetin habercisi olabilir.",
+      "Düşük kalorili yemekler de iyidir… Tabii yanında ekmek yemiyorsan!",
+      "Mutfakta aşkın tarifi: Malzemeler az, sabır çok!",
+      "Sabahları kahve, öğlenleri çay, akşamları bol yemek… Hayatın dengesi bu olmalı!",
+      "En iyi sos: Mutluluk sosu… Üstelik her tarife yakışır!",
+      "Spatula mı kaşık mı tartışmasına gerek yok; yeter ki elimizde yemek olsun.",
+      "Yanık yemek mi? O da bir sanat eseri, siyah-beyaz tablo gibi düşün!",
+      "İyi pişmiş, az pişmiş, çok pişmiş… Önemli olan her lokmada hayatı hissetmek.",
+      "Aç ayı oynamaz ama mutfakta dans edebilir!",
+      "Yemeği çok sevenler, evdeki huzur dengesini iyi bilirler.",
+      "Patates kızartması kokusu: Mutfağa giriş biletim!",
+      "Düşünce yapım: ‘Tokum ama yine de bir bakayım.’",
+      "Mükemmel yemeğe giden yol: Birazcık tarif, bolca özgüven.",
+      "Her başarısız yemeğin arkasında ‘Göz kararı ekledim’ cümlesi vardır.",
+      "Kaloriler, yediklerimizin başkalarına ihbar ettiği küçük sırlardır!",
+      "Mutluluk: Keki fırından çıkardıktan hemen sonra kokusunu içine çekmek.",
+      "Mutfakta en sevdiğim müzik aleti: Çatal ve bıçak senfonisi.",
+      "Yemek yaparken kilo vermek mümkün olsaydı keşke, tencere kaldıra kaldıra kol kası yaptım!",
+      "Çorbada tuzum olsun, ama tuzu da kaçırmayayım.",
+      "Tatlı krizinin tek panzehiri, o tatlıyı yemek!",
+      "Tarif kitapları iyidir hoş da, annemin göz kararı tarifi her zaman baş tacıdır.",
+      "Ocağın başında beklemek zen meditasyonu gibi; tabii tencerenin dibi tutmazsa!",
+      "Yanlış tarif diye bir şey yoktur, mutfağa uyarlanmış sanatsal keşifler vardır.",
+      "Yumurtayı kırmadan rafadan yapabilen nesildenim; tabii bunu kimseye söylemeyin!",
+      "Diyetler gelir gider, ama lezzet kalıcıdır.",
+      "Mutfakta geçen zamanın hesabını tutma, çıkan lezzetin keyfini çıkar!",
+      "En güçlü sihirli sözcük: ‘Yemek hazır!’",
+      "Kahve kokusu, sabahları beni yataktan kaldırmanın en lezzetli yoludur.",
+      "Her akşam yemeği, küçük bir kutlama fırsatıdır.",
+      "Yemek sanat ise, ben Michelangelo; tabii her zaman değil!",
+      "Tuz kaçtı, biber yetişti, en büyük dostumuz limon suyu!",
+      "Bugünün menüsü: Bol kahkaha soslu keyif tabağı.",
+      "Çay demlenirken dünyayı kurtarmak için çok vaktim oluyor.",
+      "Hayatı baharatlı seviyorum; fazla tuzluya da hayır demem.",
+      "Bu akşam yemeği menüsü: Bütün haftanın stresini eritme seansı!",
+      "Çok pişmiş et varsa, kurumuş ekmek de bulunur elbet.",
+      "Salata yemeye karar vermek kolay, salatayı yemeden atıştırmamak zor.",
+      "Mutfakta yarış halindeyiz: Patatesler soyulurken kim hızlı olacak?",
+      "Her sabah tek derdim: Kahvaltı mı yapayım yoksa uykuma devam mı edeyim?",
+      "Yemek davetlerinde en zor kısım, sofrayı toplamaya çalışırken ikinci tabağı gizlice yemek.",
+      "Diyet, cuma gününden pazartesiye ertelenmek için var.",
+      "Hayat tatsız tuzsuz olmamalı; o yüzden ben her zaman mutfaktayım!",
+      "Etli yemeğin yanında sebze de olsun ki vicdanımız rahat etsin.",
+      "Tatlı krizine girince suçlu hissetmek, tatlıyı yerkenki mutluluğu yok etmiyor maalesef.",
+      "Günün sonunda bulaşıklar yıkansa da, güzel bir yemek geriye mutlu bir midede iz bırakır.",
+      "Tarifleri aynen uygulamak mı? Yok canım, o kadar da disiplinli değilim.",
+      "Açlık, yemek yapma isteğinin en büyük motoru.",
+      "Tabaktakileri sonuna kadar yiyenlere gelsin bu alkış!",
+      "Mutfak, ruhun doyduğu yer; tabii mideni de es geçmeyelim.",
+      "Bir tutam tuzu abartıp deniz yaptım!",
+      "Bir gün masada ekmek yoksa, o gün kesin misafir gelecektir.",
+      "Pilavın tane tane olması tam bir gönül işi.",
+      "Yemek fotoğraflarının altına yazılabilecek tek doğru söz: ‘Beni ye!’",
+      "Her güzel yemeğin arkasında, dökülen göz kararı malzeme vardır.",
+      "Evdeki hesap, mutfaktaki tencereye uymaz.",
+      "Tatlı cenneti neresi? Kendi mutfağım!",
+      "Bir dilim pizza, tüm sorunları ısırıp atmamı sağlıyor.",
+      "Mutfak, eve dair en lezzetli sebep!",
+      "Diyete başlamadan önce son bir dilim cheesecake… Sanırım 100. ‘son dilim’ bu.",
+      "Baharatların da ruhu var, azıcık ekleyince sohbetleri bile renklendiriyor.",
+      "Doyduğunu zannetmek, ikinci tabağı görmezden gelmekle başlar.",
+      "Ocakta yemek unutmanın en büyük belirtisi: Yanık kokusu alarmdan önce seni bulur.",
+      "Şu dünyada iki tip insan vardır: Yemek yapmayı sevenler ve yemeyi sevenler.",
+      "Mutfakta yaratıcılığın sınırı yok; dün yaptığım yemeği bugün tanıyamıyorum.",
+      "Tüm dünyayı gezmek mi? Önce dünya mutfaklarını gezelim bence!",
+      "Sarılması en güzel şey: Sıcak bir çay bardağı ve taze börek kokusu.",
+      "Karnım tokken bile atıştırmalık bir şeyler aramak benim gizli yeteneğim.",
+      "Menemen, soğanlı mı soğansız mı? Mutfakta tek tartışma bu olsun!",
+      "Karnabahar sevmeyenler: Ona biraz ilgi, alaka ve sos ekleyin, bakın nasıl keyifli oluyor.",
+      "Yemek yaparken telefonla konuşmak, tarifleri altüst etmenin en garanti yolu.",
+      "Mutfak saati hep ileri gidiyor, çünkü yemek pişerken zaman hızlı geçiyor.",
+      "Son lokmayı bırakmak ile bırakmamak arasındaki o derin ikilemdeyim!"
+    ];
+    
+    // Rastgele söz seçimi (karışık)
+    function getRandomQuote() {
+      return localQuotes[Math.floor(Math.random() * localQuotes.length)];
+    }
+    
+    // Güncelleme: Sadece butona tıklandığında söz değişir
+    let usedQuotes = new Set();
+    function updateQuote() {
+      let newQuote = "";
+      let attempts = 0;
+      do {
+        newQuote = getRandomQuote();
+        attempts++;
+      } while (usedQuotes.has(newQuote) && attempts < 5);
+      if (attempts >= 5) { usedQuotes.clear(); }
+      usedQuotes.add(newQuote);
+      const quoteBox = document.getElementById("quoteBox");
+      quoteBox.style.animation = "none";
+      void quoteBox.offsetWidth; // Reflow tetikler
+      quoteBox.style.animation = null;
+      // İçeriği temizle ve söz metnini ayrı bir span olarak ekle
+      quoteBox.innerHTML = "";
+      const quoteTextSpan = document.createElement("span");
+      quoteTextSpan.id = "quoteText";
+      quoteTextSpan.textContent = newQuote;
+      quoteBox.appendChild(quoteTextSpan);
+      // Kalp ikonunu oluştur veya tekrar kullan
+      let favIcon = document.getElementById("favoriteIcon");
+      if (!favIcon) {
+        favIcon = document.createElement("span");
+        favIcon.id = "favoriteIcon";
+        favIcon.style.marginLeft = "10px";
+        favIcon.style.cursor = "pointer";
+        favIcon.onclick = toggleFavorite;
+      }
+      favIcon.textContent = " ❤";
+      quoteBox.appendChild(favIcon);
+      updateFavoriteIcon();
+    }
+    
+    // Söz kopyalama
+    function copyQuote() {
+      const quoteText = document.getElementById("quoteText").textContent.trim();
+      if (!quoteText) return;
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(quoteText)
+          .then(() => { alert("Söz kopyalandı!"); })
+          .catch(err => { console.error("Kopyalama hatası:", err); fallbackCopyTextToClipboard(quoteText); });
+      } else {
+        fallbackCopyTextToClipboard(quoteText);
+      }
+    }
+    function fallbackCopyTextToClipboard(text) {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand("copy");
+        alert("Söz kopyalandı!");
+      } catch (err) {
+        console.error("Kopyalama hatası (fallback):", err);
+      }
+      document.body.removeChild(textArea);
+    }
+    
+    // Emoji kopyalama
+    function copyEmoji(emoji) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(emoji)
+          .then(() => { alert("Emoji kopyalandı: " + emoji); })
+          .catch(err => { console.error("Emoji kopyalama hatası:", err); fallbackCopyTextToClipboard(emoji); });
+      } else {
+        fallbackCopyTextToClipboard(emoji);
+      }
+    }
+    
+    // Söz arama (yerelQuotes arasında arama)
+    function searchQuote() {
+      const searchTerm = document.getElementById("quoteSearchInput").value.trim().toLowerCase();
+      if (!searchTerm) {
+        alert("Lütfen arama terimi girin.");
+        return;
+      }
+      const filtered = localQuotes.filter(q => q.toLowerCase().includes(searchTerm));
+      if (filtered.length === 0) {
+        alert("Aradığınız kelimeyi içeren söz bulunamadı.");
+      } else {
+        const randomIndex = Math.floor(Math.random() * filtered.length);
+        const quoteBox = document.getElementById("quoteBox");
+        quoteBox.innerHTML = "";
+        const quoteTextSpan = document.createElement("span");
+        quoteTextSpan.id = "quoteText";
+        quoteTextSpan.textContent = filtered[randomIndex];
+        quoteBox.appendChild(quoteTextSpan);
+        let favIcon = document.getElementById("favoriteIcon");
+        if (!favIcon) {
+          favIcon = document.createElement("span");
+          favIcon.id = "favoriteIcon";
+          favIcon.style.marginLeft = "10px";
+          favIcon.style.cursor = "pointer";
+          favIcon.onclick = toggleFavorite;
+        }
+        favIcon.textContent = " ❤";
+        quoteBox.appendChild(favIcon);
+        updateFavoriteIcon();
+      }
+    }
+    
+    // Etiket arama
+    function generateHashtags(keyword) {
+      const suffixes = ["", "Lezzet", "Tarif", "Mutfağı", "Sever", "Keyif", "Gurme", "Sofra", "Evim", "Aşk"];
+      return suffixes.map(suffix => `#${keyword}${suffix}`);
+    }
+    function searchHashtags() {
+      const keyword = document.getElementById("hashtagInput").value.trim();
+      const resultsContainer = document.getElementById("hashtagResults");
+      resultsContainer.innerHTML = "";
+      if (!keyword) {
+        resultsContainer.innerText = "Lütfen bir kelime girin.";
+        return;
+      }
+      const hashtags = generateHashtags(keyword);
+      hashtags.forEach(tag => {
+        const span = document.createElement("span");
+        span.innerText = tag;
+        resultsContainer.appendChild(span);
+      });
+    }
+    
+    // Favori ikonunun rengini güncelle (favorideyse kırmızı, değilse gri)
+    function updateFavoriteIcon() {
+      const favIcon = document.getElementById("favoriteIcon");
+      if (!favIcon) return;
+      const currentQuote = document.getElementById("quoteText").textContent.trim();
+      if (favorites.includes(currentQuote)) {
+        favIcon.style.color = "red";
+      } else {
+        favIcon.style.color = "#ccc";
+      }
+    }
+    
+    // Gelen sözü favorilere ekle veya çıkar (toggle)
+    function toggleFavorite() {
+      const quoteText = document.getElementById("quoteText").textContent.trim();
+      if (!quoteText || quoteText === "Yükleniyor...") return;
+      const index = favorites.indexOf(quoteText);
+      if (index === -1) {
+        favorites.push(quoteText);
+        alert("Söz favorilere eklendi!");
+      } else {
+        favorites.splice(index, 1);
+        alert("Söz favorilerden kaldırıldı!");
+      }
+      localStorage.setItem('favorites', JSON.stringify(favorites));
+      updateFavoriteIcon();
+      updateFavoritesContainer();
+    }
+    
+    // Sayfa yüklendiğinde ilk sözü göster
+    window.onload = () => { updateQuote(); };
+  </script>
+</body>
+</html>
