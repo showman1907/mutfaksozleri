@@ -75,8 +75,8 @@
     .container {
       flex: 1;
       max-width: 800px;
-      margin: 40px auto;
-      padding: 20px;
+      margin: 20px auto; /* Mobilde biraz daha yakın */
+      padding: 15px;
       background: rgba(255,255,255,0.15);
       border-radius: 10px;
       backdrop-filter: blur(6px);
@@ -205,11 +205,14 @@
       padding: 5px 10px;
       background: #fff;
       border-radius: 3px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
+    .hashtag-results span:hover { background: #ddd; }
     /* Mobil uyum */
     @media (max-width: 600px) {
       header h1 { font-size: 1.4em; }
-      .container { margin: 20px auto; width: 90%; padding: 15px; }
+      .container { margin: 10px auto; width: 95%; padding: 10px; }
       #quoteBox { font-size: 1.1em; }
       .quote-search input { width: 60%; }
     }
@@ -238,9 +241,7 @@
     </div>
 
     <!-- Söz Kutusu (Favori kalp ikonu eklenecek) -->
-    <div id="quoteBox">
-      <!-- Söz metni ayrı bir span içine eklenecek -->
-    </div>
+    <div id="quoteBox"></div>
     
     <!-- Buton Grubu: Yeni Söz Getir, Sözü Kopyala -->
     <div class="button-group">
@@ -291,7 +292,7 @@
     if (localStorage.getItem('favorites')) {
       favorites = JSON.parse(localStorage.getItem('favorites'));
     }
-    // Belirtilen otomatik favori sözleri (varsa) kaldır
+    // Belirtilen otomatik favori sözleri kaldır
     const bannedFavorites = [
       "Çok pişmiş et varsa, kurumuş ekmek de bulunur elbet.",
       "Her sabah tek derdim: Kahvaltı mı yapayım yoksa uykuma devam mı edeyim?",
@@ -302,7 +303,6 @@
 
     function updateFavoritesContainer() {
       const container = document.getElementById("favoritesContainer");
-      // Güncel favorileri yeniden filtreleyelim (banned sözleri kaldır)
       favorites = favorites.filter(fav => !bannedFavorites.includes(fav));
       localStorage.setItem('favorites', JSON.stringify(favorites));
       
@@ -353,7 +353,6 @@
     
     // --- Yerel Sözler ---
     const localQuotes = [
-      // Eski 15 söz
       "Bir lokma mutluluk, koca bir gün gülümseme yaratır.",
       "Sevgiyle pişen yemeğin tadı, tarif kitaplarında yazmaz.",
       "Mutfağın sırrı, malzemelerin tazeliği değil, şefin kalbidir.",
@@ -369,7 +368,6 @@
       "En güzel tat, evde pişendir.",
       "Mutfakta zaman geçirmek, ruhun dinlenmesidir.",
       "Tabağınızdaki hikaye, şefin yüreğinden başlar.",
-      // Yeni eklenen sözler
       "Mutfakta zaman geçirmek ruhuma iyi geliyor, mideme daha da iyi geliyor!",
       "Benim diyet planım: Yemeği azalt, kahkahayı artır, tatlıyı asla ihmal etme!",
       "Her tarife bir tutam sevgi eklemezsen, tadı hep eksik kalır!",
@@ -600,6 +598,9 @@
       hashtags.forEach(tag => {
         const span = document.createElement("span");
         span.innerText = tag;
+        span.style.cursor = "pointer";
+        // Tıklandığında hashtag kopyalansın
+        span.onclick = function() { copyEmoji(tag); };
         resultsContainer.appendChild(span);
       });
     }
@@ -610,9 +611,9 @@
       if (!favIcon) return;
       const currentQuote = document.getElementById("quoteText").textContent.trim();
       if (favorites.includes(currentQuote)) {
-        favIcon.style.color = "red";
+        favIcon.style.setProperty("color", "red", "important");
       } else {
-        favIcon.style.color = "#ccc";
+        favIcon.style.setProperty("color", "#ccc", "important");
       }
     }
     
