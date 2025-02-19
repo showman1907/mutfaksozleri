@@ -2,6 +2,8 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <!-- Mobil uyum için viewport -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GÜLER MUTFAK LEZZETLERİ</title>
   <style>
     /* Genel sıfırlama */
@@ -318,8 +320,11 @@
         favorites.forEach((fav, i) => {
           const favDiv = document.createElement("div");
           favDiv.style.marginBottom = "10px";
+          // Favori metni için bir span oluşturuyoruz ve tıklanabilir yapıyoruz
           const favSpan = document.createElement("span");
           favSpan.textContent = (i + 1) + ". " + fav;
+          favSpan.style.cursor = "pointer";
+          favSpan.onclick = function() { copyFavorite(fav); };
           favDiv.appendChild(favSpan);
           // "x" butonu ekle
           const removeBtn = document.createElement("button");
@@ -330,6 +335,15 @@
           favDiv.appendChild(removeBtn);
           container.appendChild(favDiv);
         });
+      }
+    }
+    function copyFavorite(quote) {
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(quote)
+          .then(() => { alert("Favori söz kopyalandı: " + quote); })
+          .catch(err => { console.error("Favori kopyalama hatası:", err); });
+      } else {
+        fallbackCopyTextToClipboard(quote);
       }
     }
     function removeFavorite(quote) {
@@ -599,7 +613,6 @@
         const span = document.createElement("span");
         span.innerText = tag;
         span.style.cursor = "pointer";
-        // Tıklandığında hashtag kopyalansın
         span.onclick = function() { copyEmoji(tag); };
         resultsContainer.appendChild(span);
       });
